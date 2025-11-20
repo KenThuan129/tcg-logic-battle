@@ -56,11 +56,27 @@ jobs:
             npm install --no-save lightningcss-linux-x64-gnu
           fi
 
+      - name: Move API routes (not needed for static export)
+        run: |
+          # Move API routes out of the way during build since they're not used in static export
+          # and they cause type errors in Next.js 16
+          if [ -d "app/api" ]; then
+            mv app/api app/api.backup || echo "Already moved"
+          fi
+
       - name: Build
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
           # Turbopack is disabled in package.json script
         run: npm run export
+
+      - name: Restore API routes
+        if: always()
+        run: |
+          # Restore API routes after build (they weren't used but keep them for other deployments)
+          if [ -d "app/api.backup" ]; then
+            mv app/api.backup app/api || echo "Already restored"
+          fi
 
       - name: Verify build output
         run: |
