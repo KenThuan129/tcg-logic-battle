@@ -36,6 +36,19 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
         run: npm run export
 
+      - name: Verify build output
+        run: |
+          if [ ! -d "out" ]; then
+            echo "Build failed: 'out' directory not found"
+            exit 1
+          fi
+          if [ ! -f "out/index.html" ]; then
+            echo "Build failed: index.html not found in out directory"
+            exit 1
+          fi
+          echo "Build verification successful"
+          ls -la out/ | head -20
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
