@@ -26,33 +26,40 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # Don't cache npm to avoid cached broken installations
 
-      - name: Install dependencies
+      - name: Clean install dependencies
         run: |
-          # Clear npm cache to avoid cached incomplete installations
+          # Remove package-lock.json and node_modules to fix npm optional dependency bug
+          # This is a known npm issue: https://github.com/npm/cli/issues/4828
+          rm -rf node_modules package-lock.json
+          # Clear npm cache
           npm cache clean --force
-          # Use npm install to ensure optional dependencies are properly installed
-          # --include=optional ensures optional dependencies (like lightningcss binaries) are installed
+          # Fresh install with optional dependencies
           npm install --include=optional --legacy-peer-deps
 
-      - name: Verify lightningcss binary
+      - name: Verify native binaries
         run: |
-          echo "Checking for lightningcss binary..."
-          if [ -d "node_modules/lightningcss-linux-x64-gnu" ]; then
-            echo "✓ Linux x64 binary package found"
-            ls -la node_modules/lightningcss-linux-x64-gnu/
+          echo "Checking for required native binaries..."
+          # Check for Tailwind CSS Oxide binary
+          if [ -d "node_modules/@tailwindcss/oxide-linux-x64-gnu" ]; then
+            echo "✓ @tailwindcss/oxide-linux-x64-gnu found"
           else
-            echo "✗ Linux x64 binary package not found"
-            echo "Attempting to install explicitly..."
+            echo "✗ @tailwindcss/oxide-linux-x64-gnu not found, installing..."
+            npm install --no-save @tailwindcss/oxide-linux-x64-gnu
+          fi
+          # Check for lightningcss binary
+          if [ -d "node_modules/lightningcss-linux-x64-gnu" ]; then
+            echo "✓ lightningcss-linux-x64-gnu found"
+          else
+            echo "✗ lightningcss-linux-x64-gnu not found, installing..."
             npm install --no-save lightningcss-linux-x64-gnu
           fi
 
       - name: Build
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
-          # Disable Turbopack for static export to avoid native module issues
-          NEXT_PRIVATE_TURBO: "0"
+          # Turbopack is disabled in package.json script
         run: npm run export
 
       - name: Verify build output
