@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# Temporary API routes backup (used during static export build)
+.api.backup

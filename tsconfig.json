@@ -32,6 +32,7 @@
   ],
   "exclude": [
     "node_modules",
-    "app/api/**/*"
+    "app/api/**/*",
+    ".api.backup/**/*"
   ]
 }

@@ -58,10 +58,10 @@ jobs:
 
       - name: Move API routes (not needed for static export)
         run: |
-          # Move API routes out of the way during build since they're not used in static export
-          # and they cause type errors in Next.js 16
+          # Move API routes completely outside app directory during build
+          # since they're not used in static export and cause type errors in Next.js 16
           if [ -d "app/api" ]; then
-            mv app/api app/api.backup || echo "Already moved"
+            mv app/api .api.backup || echo "Already moved"
           fi
 
       - name: Build
@@ -74,8 +74,8 @@ jobs:
         if: always()
         run: |
           # Restore API routes after build (they weren't used but keep them for other deployments)
-          if [ -d "app/api.backup" ]; then
-            mv app/api.backup app/api || echo "Already restored"
+          if [ -d ".api.backup" ]; then
+            mv .api.backup app/api || echo "Already restored"
           fi
 
       - name: Verify build output
