@@ -82,7 +82,40 @@ The game engine handles turn logic, card effects, mana systems, and game state s
 
 ## Deployment
 
-When deploying to production (e.g., Vercel):
+### GitHub Pages
+
+This project is configured for automatic deployment to GitHub Pages using GitHub Actions.
+
+#### Automated Deployment
+
+1. **Enable GitHub Pages in your repository**:
+   - Go to your repository Settings → Pages
+   - Under "Source", select "GitHub Actions"
+
+2. **Push to the main branch**:
+   - The workflow will automatically build and deploy your site
+   - The site will be available at `https://[your-username].github.io/[repository-name]/`
+
+#### Manual Deployment (Optional)
+
+If you want to build and deploy manually:
+
+```bash
+# Set the base path (replace with your repository name)
+export NEXT_PUBLIC_BASE_PATH="/[repository-name]"
+
+# Build the static site
+npm run export
+
+# The static files will be in the 'out' directory
+# You can push the 'out' directory contents to the gh-pages branch
+```
+
+**Note**: When deploying to GitHub Pages, only the offline mode (PvE) will be available since API routes require a server. The app will work in offline mode using local storage for decks.
+
+### Other Platforms (Vercel, Netlify, etc.)
+
+When deploying to platforms that support Next.js API routes:
 
 1. Set the Supabase environment variables in your deployment platform
 2. Ensure Realtime is enabled for the `matches` table in Supabase
